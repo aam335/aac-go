@@ -333,12 +333,12 @@ func (e *Encoder) EncodePcmBlock(inPcm []int16) (aac []byte, err uint) {
 	if len(inPcm) != e.blockSize {
 		return nil, VoErrInvalidArg
 	}
-	var ret _Ctype_VO_U32
+	var ret C.VO_U32
 	len := C.encode(e.handle,
 		unsafe.Pointer(&inPcm[0]),
-		_Ctype_int(len(inPcm)*2), // int16
+		C.int(len(inPcm)*2), // int16
 		unsafe.Pointer(&e.outbuff[0]),
-		_Ctype_int(len(e.outbuff)),
+		C.int(len(e.outbuff)),
 		&ret)
 	err = uint(ret)
 	if err != VoErrNone { // error
@@ -351,10 +351,10 @@ func (e *Encoder) EncodePcmBlock(inPcm []int16) (aac []byte, err uint) {
 func (e *Encoder) SetParamAac(aacSamplerate, nChannels int) (err uint) {
 	e.blockSize = 1024 * nChannels
 	setParametersBlock := C.AACENC_PARAM{
-		sampleRate: _Ctype_int(aacSamplerate), /*! audio file sample rate */
-		bitRate:    64000,                     /*! encoder bit rate in bits/sec */
-		nChannels:  _Ctype_short(nChannels),   /*! number of channels on input (1,2) */
-		adtsUsed:   1,                         /*! whether write adts header */
+		sampleRate: C.int(aacSamplerate), /*! audio file sample rate */
+		bitRate:    64000,                /*! encoder bit rate in bits/sec */
+		nChannels:  C.short(nChannels),   /*! number of channels on input (1,2) */
+		adtsUsed:   1,                    /*! whether write adts header */
 	}
-	return uint(C.voAACEncSetParam(e.handle, VoPidAacEncparam, _Ctype_VO_PTR(&setParametersBlock)))
+	return uint(C.voAACEncSetParam(e.handle, VoPidAacEncparam, C.VO_PTR(&setParametersBlock)))
 }
